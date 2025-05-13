@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fullscreen Game with Mouse Lock</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      background: black;
+    }
+
+    .c-button {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 24px;
+      padding: 16px 46px;
+      background: #ff9900;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .c-button:hover {
+      background: #ff8800;
+    }
+
+    iframe {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      border: none;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+
+<button class="c-button">PLAY FULLSCREEN</button>
+<iframe id="gameFrame" allow="fullscreen" src="https://windowslover1234.github.io/games/pga2/"></iframe>
+
+<script>
+  const button = document.querySelector('.c-button');
+  const iframe = document.getElementById('gameFrame');
+
+  button.onclick = async () => {
+    iframe.style.display = 'block'; // Show the iframe (game)
+    button.style.display = 'none'; // Hide the play button
+
+    // Request fullscreen on the page
+    if (document.body.requestFullscreen) {
+      await document.body.requestFullscreen();
+    }
+
+    // Lock the mouse immediately on clicking the button
+    requestPointerLock();
+
+    // Inform user to click inside the game to lock the mouse
+    alert("Click inside the game window to lock the mouse.\nPress ESC to exit fullscreen.");
+  };
+
+  // Function to request pointer lock on the body element
+  function requestPointerLock() {
+    if (document.body.requestPointerLock) {
+      document.body.requestPointerLock();
+    } else if (document.documentElement.requestPointerLock) {
+      document.documentElement.requestPointerLock();
+    }
+  }
+
+  // Listen for the ESC key to exit fullscreen and unlock the mouse
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      exitGame();
+    }
+  });
+
+  // Exit fullscreen and unlock the mouse when ESC is pressed
+  function exitGame() {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    }
+    if (document.exitPointerLock) {
+      document.exitPointerLock();
+    }
+
+    iframe.style.display = 'none';
+    button.style.display = 'block';
+  }
+
+  // Exit game if pointer lock is lost
+  document.addEventListener('pointerlockchange', function () {
+    if (document.pointerLockElement !== document.body) {
+      exitGame();
+    }
+  });
+
+  // Request pointer lock on click anywhere on the page
+  document.body.addEventListener('click', () => {
+    if (document.body.requestPointerLock) {
+      document.body.requestPointerLock();
+    }
+  });
+</script>
+
+</body>
+</html>
